@@ -15,6 +15,8 @@ function TodoForm({ onAdd }) {
     const { name, value } = e.target;
     formData[name] = value;
     setFormData(formData);
+
+    // console.log(formData);
   };
 
   const validateForm = () => {
@@ -36,6 +38,8 @@ function TodoForm({ onAdd }) {
     e.preventDefault();
 
     if (validateForm()) {
+      // alert("Tâche créée avec succès !");
+      console.log(formData);
       onAdd({
         title: formData.title,
         description: formData.description,
@@ -103,7 +107,8 @@ function TodoForm({ onAdd }) {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" onSubmit={handleSubmit}> 
+        {/* ajout de l'appel de la fonction submit */}
           Créer la tâche
         </button>
       </form>

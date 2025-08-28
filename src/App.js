@@ -30,14 +30,24 @@ function App() {
     }
   };
 
-  const addTodo = (text) => {
+  const addTodo = (data) => {
+    // console.log(data);
     const newTodo = {
+      completed: false, //par défaut car nouvelle tache
       id: Date.now(),
-      title: text,
-      completed: false,
+      title: data.title,
+      userId: 1,
+      
+    
+      // description: data.description,
+      // priority: data.priority,
+      // date: data.dueDate,
+      
     };
     todos.push(newTodo);
     setTodos(todos);
+    // console.log("Tâche ajoutée:", newTodo.id);
+    console.log(todos);
   };
 
   const toggleTodo = (id) => {
