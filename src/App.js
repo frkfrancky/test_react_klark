@@ -5,11 +5,9 @@ import TodoList from "./components/TodoList";
 import TodoStats from "./components/TodoStats";
 
 function App() {
-  const [todos, setTodos] = useState([]); //initialisé en "undefined" au lieu de tableau vide
-
+  const [todos, setTodos] = useState([]); // initialisé en tableau vide
   const [loading, setLoading] = useState(false);
-
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchTodos();
@@ -18,13 +16,15 @@ function App() {
   const fetchTodos = async () => {
     try {
       setLoading(true);
+      setError("");
       const response = await fetch(
-        "https://jsonplaceholder.typicode.com/todos" //j'ai corrigé le lien car il était erroné, il y avait un "s" de trop sur "todos"
+        "https://jsonplaceholder.typicode.com/todos" // j'ai corrigé le lien car il était erroné, il y avait un "s" de trop sur "todos"
       );
+      if (!response.ok) throw new Error("Réponse réseau invalide");
       const data = await response.json();
-      setTodos(data.slice(0, 5));
+      setTodos(data.slice(0, 5)); // on limite pour la démo
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Erreur inconnue");
     } finally {
       setLoading(false);
     }
@@ -33,38 +33,39 @@ function App() {
   const addTodo = (data) => {
     // console.log(data);
     const newTodo = {
-      completed: false, //par défaut car nouvelle tache
+      completed: false, // par défaut car nouvelle tâche
       id: Date.now(),
       title: data.title,
       userId: 1,
-      
-    
       // description: data.description,
       // priority: data.priority,
       // date: data.dueDate,
-      
     };
-    todos.push(newTodo);
-    setTodos(todos);
+    // ❌ évite todos.push() (mutation) — ✅ crée un nouveau tableau
+    setTodos((prev) => [newTodo, ...prev]);
     // console.log("Tâche ajoutée:", newTodo.id);
-    console.log(todos);
+    // console.log(todos);
   };
 
   const toggleTodo = (id) => {
-    const todo = todos.find((t) => t.id === id);
-    if (todo) {
-      todo.completed = !todo.completed;
-      setTodos([...todos]);
-    }
+    // ❌ évite mutation directe — ✅ map immuable
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
   };
 
-  const deleteTodo = (id) => {};
+  const deleteTodo = (id) => {
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+  };
 
-  const updateTodo = (id, newText) => {};
+  const updateTodo = (id, updates) => {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+    );
+  };
 
-  if (loading) {
-    return <div>Chargement...</div>;
-  }
+  if (loading) return <div>Chargement...</div>;
+  if (error) return <div>Erreur : {error}</div>;
 
   return (
     <div className="App">
@@ -78,9 +79,10 @@ function App() {
 
         <TodoList
           todos={todos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-          onUpdate={updateTodo}
+          onToggleTodo={toggleTodo}   // aligne les noms attendus
+          onDeleteTodo={deleteTodo}
+          onUpdateTodo={updateTodo}
+          loading={loading}
         />
 
         <TodoStats todos={todos} />
