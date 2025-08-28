@@ -5,7 +5,7 @@ import TodoList from "./components/TodoList";
 import TodoStats from "./components/TodoStats";
 
 function App() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState([]); //initialisé en "undefined" au lieu de tableau vide
 
   const [loading, setLoading] = useState(false);
 
@@ -73,4 +73,10 @@ function App() {
           onUpdate={updateTodo}
         />
 
-      
+        <TodoStats todos={todos} />
+      </main>
+    </div>
+  );
+}
+
+export default App;
